@@ -1,11 +1,16 @@
+#include <SoftwareSerial.h>
+
 #define STEPPER_PIN_1 9
 #define STEPPER_PIN_2 10
 #define STEPPER_PIN_3 11
 #define STEPPER_PIN_4 12
-#define BOUTON_PIN 13
+#define BLUETOOTH_DATA 5
+#define BLEUTOOTH_INPUT 6
+
+SoftwareSerial BluetoothSerial(BLEUTOOTH_INPUT, BLUETOOTH_DATA);
 
 const int TICKS_PER_DIRECTION = 2000;
-const int DELAY_BEFORE_FORWARD = 8000;
+const int DELAY_BEFORE_FORWARD = 15000;
 
 bool directionIsFront = false;
 bool motorIsMoving = false;
@@ -18,8 +23,10 @@ void setup() {
   pinMode(STEPPER_PIN_2, OUTPUT);
   pinMode(STEPPER_PIN_3, OUTPUT);
   pinMode(STEPPER_PIN_4, OUTPUT);
-  pinMode(BOUTON_PIN, INPUT);
+  pinMode(BLUETOOTH_DATA, OUTPUT);
+  pinMode(BLEUTOOTH_INPUT, INPUT);
   Serial.begin(9600);
+  BluetoothSerial.begin(9600);
 }
 
 void startCycle(){
@@ -46,9 +53,17 @@ void changeDirection(){
   delay(DELAY_BEFORE_FORWARD);
 }
 
+bool isBluetoothData(){
+  char var = 'z';
+  if (BluetoothSerial.available()){
+    var = (char) BluetoothSerial.read();
+  }
+  return var != 'z';
+}
+
 void loop() {
   // Vérifier si le bouton est appuyé pour démarrer un cycle
-  if (digitalRead(BOUTON_PIN) == LOW && !motorIsMoving) {
+  if (isBluetoothData() && !motorIsMoving) {
     startCycle();
   }
 
@@ -64,6 +79,7 @@ void loop() {
     if (tickCount >= TICKS_PER_DIRECTION) {
       changeDirection();
     }
+  
   }
 }
 
