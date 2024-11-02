@@ -1,5 +1,5 @@
 #include <SoftwareSerial.h>
-SoftwareSerial BluetoothSerial(11, 10);
+SoftwareSerial BluetoothSerial(6, 5);
 
 void setup() {
   pinMode(6, INPUT);
